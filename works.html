@@ -210,14 +210,14 @@
         });
       },
       methods: {
-        getCardStyle(work) {
-          const isMobile = window.innerWidth <= 900;
-          const scale = isMobile ? 1.5 : 0.78;
-
-          return {
-            transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
-            transformOrigin: isMobile ? 'center top' : 'top left'
-          };
+	getCardStyle(work) {
+	  const scale = window.innerWidth <= 900 ? 1.2 : 0.78; // スマホは大きく
+	  const origin = window.innerWidth <= 900 ? 'center top' : 'top left';
+	
+	  return {
+	    transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
+	    transformOrigin: origin
+	  };
         },
         getThumbnailStyle(category) {
           switch (category) {
