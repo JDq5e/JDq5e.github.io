@@ -213,9 +213,12 @@
       },
       methods: {
         getCardStyle(work) {
+          const isMobile = window.innerWidth <= 900;
+          const scale = isMobile ? 1.2 : 0.78;
+
           return {
-            transform: `scale(0.78) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
-            transformOrigin: 'top left'
+            transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
+            transformOrigin: isMobile ? 'center top' : 'top left'
           };
         },
         getThumbnailStyle(category) {
