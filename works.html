@@ -75,10 +75,22 @@
       image-rendering: pixelated; /* optional */
     }
 
-    /* フレームごとの位置微調整（必要なら） */
+    /* フレームごとの位置微調整 */
     .frame01, .frame02 , .frame03 , .frame04{
       top: 0px;
       right: 0px;
+    }
+    @media (max-width: 600px) {
+        .works {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .card {
+          transform: scale(1);
+          transform-origin: center top;
+          margin: 10px 0;
+        }
     }
 
     body {
