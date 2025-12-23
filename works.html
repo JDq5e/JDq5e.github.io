@@ -7,9 +7,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
   <style>
-    a {
-      color: rgb(200, 200, 200);
+
+
+    #p5-background{
+      position: fixed;
+      inset: 0;            /* top/left/right/bottom:0 と同じ */
+      z-index: -1;         /* 背景へ */
+      pointer-events: none;/* クリックを邪魔しない */
+      overflow: hidden;
     }
 
     .header {
@@ -76,9 +83,12 @@
       object-fit: none;
       image-rendering: pixelated; /* optional */
     }
+    .thumbnail{
+      pointer-events: none;
+    }
 
     /* フレームごとの位置微調整 */
-    .frame01, .frame02 , .frame03 , .frame04{
+    .frame01, .frame02 , .frame03 , .frame04, .frameYM, .frame05{
       top: 0px;
       right: 0px;
     }
@@ -99,54 +109,104 @@
         .card {
           transform-origin: center top;
           margin-right: 0;
-	  margin-left: 0;
-          margin-top: 40px;
-          margin-bottom: 40px;
+	        margin-left: 0;
+          margin-top: 80px;
+          margin-bottom: 160px;
         }
     }
 
     body {
       font-family: "Zen Maru Gothic", serif;
       font-weight: 400;
+      font-size: 18px;
       font-style: normal;
-      background-color: #454a4f;
       color: #ffffff;
       margin: 0;
     }
   </style>
 </head>
 <body>
+  <div id="p5-background"></div>
   <div id="app">
+    <div
+      :class="{ 'yoinemuri-flash': isYoinemuriActive }"
+    >
     <div class="header">
       <img id="headerImage" src="images/yoso/works.gif" alt="ヘッダー画像" class="moji">
     </div>
     <div class="works">
       <div style="height: 50px; width: 100%;"></div>
-      <div
-        class="card"
-        v-for="work in filteredWorks"
-        :key="work.id"
-        :style="getCardStyle(work)"
-      >
+    <div
+      class="card"
+      v-for="(work, idx) in filteredWorks"
+      :key="`${work.id}-${idx}`"
+      :style="getCardStyle(work)"
+      @click.stop
+    >
         <div class="image-container">
-          <img v-if="work.category === 'movie'" :src="frame01" alt="フレーム" class="frame frame01">
-          <img v-if="work.category === 'music'" :src="frame02" alt="フレーム" class="frame frame02">
-          <img v-if="work.category === 'illustration'" :src="frame03" alt="フレーム" class="frame frame03">
-          <img v-if="work.category === 'material'" :src="frame04" alt="フレーム" class="frame frame04">
-          <img
-            :src="work.image"
-            :alt="work.title"
-            class="thumbnail"
-            :style="getThumbnailStyle(work.category)"
+
+          <!-- ▼ yoinemuri 専用 -->
+          <div
+            v-if="work.category === 'yoinemuri'"
+            class="yoinemuri-link"
+            @mouseup.prevent="triggerAndGo(work.link)"
+            style="cursor: pointer;"
           >
+            <img
+              :src="isYoinemuriActive ? frameYMActive : frameYM"
+              alt="宵音ムリ"
+              class="frame frameYM"
+            >
+          </div>
+
+          <!-- ▼ それ以外の通常作品 -->
+          <template v-else>
+            <img
+              v-if="work.category === 'movie'"
+              :src="frame01"
+              class="frame frame01"
+              @click.stop="goTo(work)"
+            >
+            <img 
+              v-if="work.category === 'music'" 
+              :src="frame02" 
+              class="frame frame02"
+              @click.stop="goTo(work)"
+            >
+            <img 
+              v-if="work.category === 'illustration'" 
+              :src="frame03" 
+              class="frame frame03"
+              @click.stop="goTo(work)"
+            >
+            <img 
+              v-if="work.category === 'material'" 
+              :src="frame04" 
+              class="frame frame04"
+              @click.stop="goTo(work)"
+            >
+            <img 
+              v-if="work.category === 'link'" 
+              :src="frame05" 
+              class="frame frame05"
+              @click.stop="goTo(work)"
+            >
+
+            <img
+              :src="work.image"
+              :alt="work.title"
+              class="thumbnail"
+              :style="getThumbnailStyle(work.category)"
+            >
+          </template>
+
         </div>
 
         <h3>{{ work.title }}</h3>
         <p>{{ work.description }}</p>
-        <p><a :href="work.link" target="_blank">リンク</a></p>
       </div>
       <div style="height: 50px; width: 100%;">
-        <p style="text-align: center; font-size: 12px; color: #ffffff;">copyright© 稲むり 2025 All Rights Reserved.</p>
+        <p style="text-align: center; font-size: 14px; color: #ffffff;">copyright© 稲むり 2025 All Rights Reserved.</p>
       </div>
     </div>
   </div>
@@ -155,28 +215,52 @@
     Vue.createApp({
       data() {
         return {
+          //フレーム画像の定義
           filter: 'all',
           frame01: 'images/yoso/frame_movie.png',
           frame02: 'images/yoso/frame_music.png',
           frame03: 'images/yoso/frame_illustration.png',
           frame04: 'images/yoso/frame_material.png',
+          frame05: 'images/yoso/frame_link.png',
+          frameYM: 'images/yoso/frame_yoinemuri.png',
+          frameYMActive: 'images/yoso/frame_yoinemuri_1.png',
+          isYoinemuriActive: false,
+          //内容
           works: [
-	    { id: 32, image: 'images/suraimura.jpg', title: 'スライ村', description: 'MVを制作しました。キラハピ2025参加曲です。', link: 'https://www.nicovideo.jp/watch/sm45059106',  category: 'movie' },  
+            { id: 43, image: 'images/naisho.jpg', title: '内緒のサンタさん', description: 'MVを制作しました。', link: 'https://youtu.be/_roqbcKPJMo',  category: 'movie' },
+            { id: 42, image: 'images/lalala.jpg', title: '『ラララのラ』MV', description: '小田晃生様の楽曲『ラララのラ』のMVを制作いたしました。', link: 'https://youtu.be/9K7mOvT2uBE',  category: 'movie' },
+            { id: 44, image: 'images/yoso/l_t.png', title: 'Threads', description: '', link: 'https://www.threads.com/@jdq5e',  category: 'link' },
+	          { id: 41, image: 'images/mijika.jpg', title: '身近', description: '2ndアルバムをリリースしました。', link: 'https://youtu.be/QCPqsuq720E',  category: 'material' },  
+            { id: 40, image: 'images/seki_remix.jpg', title: '『咳 -Remixies-』ジャケットイラスト', description: 'コンピレーションアルバム『咳 -Remixies-』イラストを担当しました。', link: 'https://youtu.be/BXrKqPDTpCg',  category: 'illustration' },
+            { id: 39, image: 'images/hiki_goudou.jpg', title: '『Bless you.』イラスト寄稿', description: '合同誌『Bless you.』にイラストを寄稿しました。運営の手伝いもさせていただいております。', link: 'https://reiutsubo.booth.pm/items/7718300',  category: 'illustration' },
+            { id: 38, image: 'images/chill.jpg', title: '二十歳', description: 'コンピレーションアルバム『『Chill』コンピ』に書き下ろした曲です。', link: 'https://youtu.be/XBIYO-n2pRg',  category: 'music' },
+            { id: 44, image: 'images/yoso/l_e.png', title: '連絡先', description: '', link: 'inemurivc6@gmail.com',  category: 'link' },
+            { id: 37, image: 'images/seikan.jpg', title: '星間ミトン', description: '日あさ寝様に書き下ろさせていただいた楽曲です。日あさ寝様の1st EP『光としるべ』収録楽曲です。', link: 'https://youtu.be/9AIe10o_OO0',  category: 'music' },
+            { id: 36, image: '', title: '宵音ムリ', description: '', link: 'https://drive.google.com/drive/folders/1iXzscLgJJCw49khpYpySo6lsF_vYj-PC?usp=drive_link',  category: 'yoinemuri' },
+            { id: 35, image: 'images/sanporon.jpg', title: '『散歩論』 MV', description: 'MIDy様の楽曲『散歩論』のMVを制作いたしました。uotakさんとの共同制作です。', link: 'https://youtu.be/Xwkk6xvB6Bw',  category: 'movie' },
+            { id: 34, image: 'images/scale.jpg', title: 'スケール・ディストーション', description: 'コンピレーションアルバムの主催をしました。', link: 'https://www.nicovideo.jp/watch/sm45186841',  category: 'material' },
+	          { id: 33, image: 'images/suraimura.jpg', title: 'スライ村', description: 'MVを制作しました。キラハピ2025参加曲です。', link: 'https://www.nicovideo.jp/watch/sm45059106',  category: 'movie' },  
+            { id: 45, image: 'images/yoso/l_d.png', title: '倉庫', description: '', link: 'https://drive.google.com/drive/folders/1j1o906NKeZeHR6hbPXGM8qcupxwhksrO?usp=drive_link',  category: 'link' },
             { id: 32, image: 'images/torobleed.jpg', title: 'ヘリウム', description: 'コンピレーションアルバム『TORO BLEED』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44926322',  category: 'music' },
-            { id: 31, image: 'images/ww.jpg', title: 'さよなら領宇チュー', description: 'コンピレーションアルバム『Walk with (　　)』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44864414',  category: 'music' },
+            { id: 31, image: 'images/ww.jpg', title: 'さよなら領宇チュー', description: 'コンピレーションアルバム『Walk with (       )』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44864414',  category: 'music' },
             { id: 30, image: 'images/usotudu.jpg', title: 'あきのそら', description: 'コンピレーションアルバム『ウソのつづきかた』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44913244',  category: 'music' },
             { id: 29, image: 'images/zenbuore.jpg', title: 'スライ村', description: 'コンピレーションアルバム『全部俺2』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44892616',  category: 'music' },
+            { id: 44, image: 'images/yoso/l_x.png', title: 'X', description: '', link: 'https://x.com/JDq5e',  category: 'link' },
             { id: 28, image: 'images/zenbuore.jpg', title: '『全部俺2』背景', description: 'ジャケットの背景部分を担当しました。ウモ夫も描きました！', link: 'https://x.com/Zenb_Ore/status/1912823384347721912',  category: 'illustration' },
-            { id: 27, image: 'images/VDDW.jpg', title: '『VOCALOID DJ WORLD（VDDW)』イラスト', description: 'フライヤー用のイラストを担当しました。', link: 'https://x.com/shadowmixt_ktwd/status/1894712098766442881',  category: 'illustration' },
+            { id: 27, image: 'images/VDDW.jpg', title: '『VOCALOID DJ WORLD(VDDW)』イラスト', description: 'フライヤー用のイラストを担当しました。', link: 'https://x.com/shadowmixt_ktwd/status/1894712098766442881',  category: 'illustration' },
             { id: 26, image: 'images/korekaraverb.jpg', title: 'これからバーブ', description: 'MVを制作しました。ボカコレ2025冬TOP100参加曲です。', link: 'https://www.nicovideo.jp/watch/sm44691761',  category: 'movie' },
+            { id: 45, image: 'images/yoso/l_b.png', title: 'BOOTH', description: '', link: 'https://saiminnohhoh.booth.pm/',  category: 'link' },
             { id: 25, image: 'images/likeamothtoaflame.jpg', title: '『like a moth to a flame』イラスト', description: '香柚季様の楽曲『like a moth to a flame』イラスト及びアニメーションを担当しました。', link: 'https://www.nicovideo.jp/watch/sm44607235' ,  category: 'illustration'},
             { id: 24, image: 'images/kemurinominato.jpg', title: '『煙の湊』MV', description: '世界電力様の楽曲『煙の湊』MVを担当いたしました。', link: 'https://www.nicovideo.jp/watch/sm44568500' ,  category: 'movie'},
             { id: 23, image: 'images/seki.jpg', title: '《咳》ジャケットイラスト', description: 'コンピレーションアルバム《咳》イラストを担当しました。', link: 'https://kazehikicompi.booth.pm/items/6552582' ,  category: 'illustration'},
+            { id: 45, image: 'images/yoso/l_bs.png', title: 'Bluesky', description: '', link: 'https://bsky.app/profile/jdq5e.bsky.social',  category: 'link' },
             { id: 22, image: 'images/kawaiicompi.jpg', title: 'してんししてん', description: 'コンピレーションアルバム『カワイイコンピレーション～コミック版～』に書き下ろした曲です。ジャケットとXFDもイラストで少し手伝っております。', link: 'https://www.nicovideo.jp/watch/sm44339297' ,  category: 'music'},
             { id: 21, image: 'images/genzaichi.jpg', title: '『ボーカロイド文化の現在地２』表紙イラスト', description: '表紙のイラストを担当しました。', link: 'https://x.com/highland_sh/status/1856896970000142580' ,  category: 'illustration'},
             { id: 20, image: 'images/zattou.jpg', title: '雑踏の気持ち', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm44246685' ,  category: 'movie'},
             { id: 19, image: 'images/bluehole.jpg', title: 'blue hOle', description: 'バチカアフ様の1stミニアルバム『blue hOle』に原作を提供しました。', link: 'https://www.youtube.com/watch?v=QY828rDU2yQ' ,  category: 'music'},
+            { id: 45, image: 'images/yoso/l_n.png', title: 'niconico', description: '', link: 'https://www.nicovideo.jp/user/72858407',  category: 'link' },
             { id: 18, image: 'images/sonataka.jpg', title: '『それと同じ陽の暖かさ』作詞・作曲・調声・動画', description: 'ボカタッグ参加作品（遅刻）です。', link: 'https://www.nicovideo.jp/watch/sm43889685' ,  category: 'movie'},
+            { id: 45, image: 'images/yoso/l_bl.png', title: 'Bilibili', description: '', link: 'https://space.bilibili.com/3546781648423361',  category: 'link' },
             { id: 17, image: 'images/reiteshow.jpg', title: 'これからバーブ', description: 'コンピレーションアルバム『レイトショー』に書き下ろした曲です。', link: 'https://youtu.be/kItKsZnH40Q?si=uu-_RyG48fSSiOM2' ,  category: 'music'},
             { id: 16, image: 'images/xyoku.jpg', title: '『ょく』作詞・作曲・調声', description: 'ボカタッグ参加作品です。', link: 'https://www.nicovideo.jp/watch/sm43683720' ,  category: 'music'},
             { id: 15, image: 'images/shadoteto.jpg', title: '『シャドテト』イラスト', description: 'フライヤー用のイラストを担当しました。', link: 'https://x.com/shadowmixt_ktwd/status/1774030255067631961' ,  category: 'illustration'},
@@ -190,9 +274,11 @@
             { id: 7, image: 'images/retro.jpg', title: 'レトロフューチャー・ビーイング', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm42044823' ,  category: 'movie'},
             { id: 6, image: 'images/tumoyuki.jpg', title: 'つもゆきパーク逍遥', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41843498' ,  category: 'movie'},
             { id: 5, image: 'images/nikotte.jpg', title: 'NIKKOTTE', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41744046' ,  category: 'movie'},
+            { id: 44, image: 'images/yoso/l_y.png', title: 'YouTube', description: '', link: 'https://www.youtube.com/@user-JDq5e',  category: 'link' },
             { id: 4, image: 'images/deadend.jpg', title: 'デッドエンド♡チョコレート', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41311489' ,  category: 'movie'},
             { id: 3, image: 'images/yukuehumei.jpg', title: '行方不名', description: '無色透名祭に参加しました。', link: 'https://www.nicovideo.jp/watch/so40804218' ,  category: 'music'},
             { id: 2, image: 'images/seikimatu.jpg', title: '世紀末初恋譚', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm39846942' ,  category: 'movie'},
+            { id: 44, image: 'images/yoso/l_s.png', title: 'Soundcloud', description: '', link: 'https://soundcloud.com/user-295610565',  category: 'link' },
             { id: 1, image: 'images/ita.jpg', title: '居た。', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm39053012' ,  category: 'movie'}
           ]
         };
@@ -205,23 +291,71 @@
           return this.works.filter(w => w.category === this.filter);
         }
       },
+
       mounted() {
-        this.works.forEach(work => {
-          work.offsetX = Math.floor(Math.random() * 30 - 15); 
-          work.offsetY = Math.floor(Math.random() * 30 - 15); 
-          work.rotation = Math.random() * 2 - 1;               // -2deg〜+2deg
+        // 1) 全カードにランダム見た目を付与（ここはOK）
+        this.works.forEach((work) => {
+          work.offsetX = Math.floor(Math.random() * 30 - 15);
+          work.offsetY = Math.floor(Math.random() * 30 - 15);
+          work.rotation = Math.random() * 2 - 1;
+        });
+
+        // 2) linkカテゴリだけ“1回だけ”順番をシャッフル
+        const target = 'link';
+
+        const idxs = [];
+        const items = [];
+
+        this.works.forEach((w, i) => {
+          if (w.category === target) {
+            idxs.push(i);
+            items.push(w);
+          }
+        });
+
+        const shuffled = this.shuffle(items);
+        idxs.forEach((pos, k) => {
+          this.works[pos] = shuffled[k];
         });
       },
+
       methods: {
-	getCardStyle(work) {
-	  const scale = window.innerWidth <= 990 ? 1.2 : 0.78; // スマホは大きく
-	  const origin = window.innerWidth <= 990 ? 'center top' : 'top left';
-	
-	  return {
-	    transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
-	    transformOrigin: origin
-	  };
+        shuffle(arr) {
+          arr = [...arr];
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
         },
+
+        //宵音ムリアニメーション2
+        triggerAndGo(url) {
+          if (this.isYoinemuriActive) return;
+
+          this.isYoinemuriActive = true;
+
+          setTimeout(() => {
+            window.open(url, '_blank');
+            this.isYoinemuriActive = false;
+          }, 100);
+        },
+
+        getCardStyle(work) {
+          const scale = window.innerWidth <= 990 ? 1.3 : 0.78; // スマホは大きく
+          const origin = window.innerWidth <= 990 ? 'center top' : 'top left';
+        
+          return {
+            transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
+            transformOrigin: origin
+          };
+        },
+
+          goTo(work) {
+            if (!work.link) return;
+            window.open(work.link, '_blank', 'noopener');
+          },
+
         getThumbnailStyle(category) {
           switch (category) {
             case 'movie':
@@ -254,7 +388,7 @@
                 objectFit: 'cover',
                 zIndex: 1
               };
-              case 'material':
+            case 'material':
               return {
                 position: 'absolute',
                 top: '107px',
@@ -264,12 +398,148 @@
                 objectFit: 'cover',
                 zIndex: 1
               };
+            case 'link':
+              return {
+                position: 'absolute',
+                top: '0px',
+                left: '0px',
+                width: '360px',
+                height: '360px',
+                objectFit: 'cover',
+                zIndex: 1
+              };
+              
             default:
               return {};
           }
         }
       }
     }).mount('#app');
+  </script>
+
+  <script>
+    const FLOW_SPEED = 0.15;
+    const FLOW_ANGLE = Math.PI * 0.15; // 角度（0=右, PI/2=下）
+
+    const FLOW_VX = Math.cos(FLOW_ANGLE) * FLOW_SPEED;
+    const FLOW_VY = Math.sin(FLOW_ANGLE) * FLOW_SPEED;
+
+    const bgSketch = (p) => {
+      let particles = [];
+      let imgs = [];
+      let PARTICLE_COUNT;
+
+      p.preload = () => {
+        for (let i = 1; i <= 9; i++) {
+          imgs.push(p.loadImage(`images/bg/p0${i}.png`));
+        }
+      };
+
+      let imgBag = [];
+
+      function refillImgBag() {
+        imgBag = [];
+        // 各画像を同数だけ入れる（偏りを抑える）
+        for (const im of imgs) {
+          for (let k = 0; k < 3; k++) imgBag.push(im); // 3は好みで調整
+        }
+        // シャッフル
+        for (let i = imgBag.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [imgBag[i], imgBag[j]] = [imgBag[j], imgBag[i]];
+        }
+      }
+
+      function pickImg() {
+        if (imgBag.length === 0) refillImgBag();
+        return imgBag.pop();
+      }
+
+      p.setup = () => {
+        p.background(90, 162, 163)
+        const cnv = p.createCanvas(window.innerWidth, window.innerHeight);
+        cnv.parent('p5-background');
+        p.pixelDensity(1);
+        p.frameRate(30);
+
+        const isMobile = window.innerWidth <= 990;
+        PARTICLE_COUNT = isMobile ? 20 : 40;
+
+        refillImgBag();
+
+        // ★ ここ：グリッド数を PARTICLE_COUNT に合わせて決める
+        const cols = Math.ceil(Math.sqrt(PARTICLE_COUNT));
+        const rows = Math.ceil(PARTICLE_COUNT / cols);
+        const cellW = p.width / cols;
+        const cellH = p.height / rows;
+
+        let idx = 0;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (idx >= PARTICLE_COUNT) break;
+
+            // セル中心＋少しだけ揺らす（ジッター）
+            const jitterX = cellW * 0.45; // 0.2〜0.45くらいで好み調整
+            const jitterY = cellH * 0.45;
+
+            particles.push(makeParticle(
+              (c + 0.5) * cellW + p.random(-jitterX, jitterX),
+              (r + 0.5) * cellH + p.random(-jitterY, jitterY),
+              pickImg()
+            ));
+            idx++;
+          }
+        }
+      };
+
+      function makeParticle(x, y, img) {
+        return {
+          x,
+          y,
+          img,
+
+          // ★ 初期回転だけランダム
+          rot: p.random(p.TWO_PI),
+
+          size: p.random(80, 120),
+          alpha: p.random(80, 150)
+        };
+      }
+
+      p.draw = () => {
+        if (p.frameCount <2){
+          p.background(90, 162, 163);
+        }else{
+          p.background(90, 162, 163, 20);
+        }
+        
+        for (const pt of particles) {
+          // ★ 全粒子が同じ速度・同じ方向
+          pt.x += FLOW_VX;
+          pt.y += FLOW_VY;
+
+          // 画面外ループ
+          if (pt.x < -pt.size) pt.x = p.width + pt.size;
+          if (pt.x > p.width + pt.size) pt.x = -pt.size;
+          if (pt.y < -pt.size) pt.y = p.height + pt.size;
+          if (pt.y > p.height + pt.size) pt.y = -pt.size;
+
+          p.push();
+          p.translate(pt.x, pt.y);
+          p.rotate(pt.rot); // ★ 固定回転
+          p.tint(255, pt.alpha);
+          p.image(pt.img, -pt.size/2, -pt.size/2, pt.size, pt.size);
+          p.pop();
+        }
+      };
+
+      p.windowResized = () => {
+        p.resizeCanvas(window.innerWidth, window.innerHeight);
+        p.background(90, 162, 163)
+      };
+    };
+
+    new p5(bgSketch);
   </script>
 </body>
 </html>
