@@ -342,6 +342,7 @@
         },
 
         getCardStyle(work) {
+		  const scale = window.innerWidth <= 990 ? 1.5 : 0.78;
           const origin = window.innerWidth <= 990 ? 'center top' : 'top left';
         
           return {
@@ -542,6 +543,7 @@
   </script>
 </body>
 </html>
+
 
 
 
