@@ -92,7 +92,7 @@
       top: 0px;
       right: 0px;
     }
-    @media (max-width: 990px) {
+    @media (max-width: 800px) {
         .header {
           width: 0vw;
           display: none;
@@ -273,7 +273,7 @@
             { id: 8, image: 'images/dreampillow.jpg', title: 'Dream Pillow', description: '1stアルバムをリリースしました。', link: 'https://booth.pm/ja/items/4834996' ,  category: 'material'},
             { id: 7, image: 'images/retro.jpg', title: 'レトロフューチャー・ビーイング', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm42044823' ,  category: 'movie'},
             { id: 6, image: 'images/tumoyuki.jpg', title: 'つもゆきパーク逍遥', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41843498' ,  category: 'movie'},
-            { id: 5, image: 'images/nikotte.jpg', title: 'NIKKOTTE', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41744046' ,  category: 'movie'},
+            { id: 5, image: 'images/nikotte.jpg', title: 'NIKOTTE', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41744046' ,  category: 'movie'},
             { id: 44, image: 'images/yoso/l_y.png', title: 'YouTube', description: '', link: 'https://www.youtube.com/@user-JDq5e',  category: 'link' },
             { id: 4, image: 'images/deadend.jpg', title: 'デッドエンド♡チョコレート', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41311489' ,  category: 'movie'},
             { id: 3, image: 'images/yukuehumei.jpg', title: '行方不名', description: '無色透名祭に参加しました。', link: 'https://www.nicovideo.jp/watch/so40804218' ,  category: 'music'},
@@ -342,8 +342,8 @@
         },
 
         getCardStyle(work) {
-		  const scale = window.innerWidth <= 990 ? 1.5 : 0.78;
-          const origin = window.innerWidth <= 990 ? 'center top' : 'top left';
+		  const scale = window.innerWidth <= 800 ? 1.5 : 0.78;
+          const origin = window.innerWidth <= 800 ? 'center top' : 'top left';
         
           return {
             transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
@@ -543,6 +543,7 @@
   </script>
 </body>
 </html>
+
 
 
 
