@@ -92,7 +92,7 @@
       top: 0px;
       right: 0px;
     }
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
         .header {
           width: 0vw;
           display: none;
@@ -342,8 +342,8 @@
         },
 
         getCardStyle(work) {
-		  const scale = window.innerWidth <= 800 ? 1.5 : 0.78;
-          const origin = window.innerWidth <= 800 ? 'center top' : 'top left';
+		  const scale = window.innerWidth <= 900 ? 1.5 : 0.78;
+          const origin = window.innerWidth <= 900 ? 'center top' : 'top left';
         
           return {
             transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
@@ -543,6 +543,7 @@
   </script>
 </body>
 </html>
+
 
 
 
