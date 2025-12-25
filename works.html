@@ -2,7 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Works</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="作ったもの">
+  <meta name="author" content="稲むり">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- OGP (Open Graph Protocol) for SNS sharing -->
+  <meta property="og:title" content="Works | 稲むり">
+  <meta property="og:description" content="作ったもの">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jdq5e.github.io/works">
+  <meta property="og:image" content="https://jdq5e.github.io/works/images/yoso/hutonG.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Works | 稲むり">
+  <meta name="twitter:description" content="作ったもの">
+  <meta name="twitter:image" content="https://jdq5e.github.io/works/images/yoso/hutonG.jpg">
+
+  <title>Works | 稲むり</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
@@ -44,18 +62,12 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      min-height: 100vh;   /* 画面以上なら伸びる */
-      height: auto;         /* ← 固定高さをやめる！ */
-      overflow-y: visible;  /* ← 必要なら visible */
-      overflow-x: hidden;
-      position: relative;
+      min-height: 100vh;
       padding-left: 15px;
       padding-right: 0px;
       padding-top: 5px;
       box-sizing: border-box;
-      overflow-y: auto;
-      overflow-x: hidden; /* ← 横のはみ出しを防ぐ */
-      position: relative;
+      overflow-x: hidden;
     }
 
     .card {
@@ -65,22 +77,22 @@
       margin-right: -20px;
       margin-top: 10px;
       transition: transform 0.3s ease;
+      --card-scale: 0.78;
     }
     .image-container {
       position: relative;
       width: 360px;
       height: 360px;
-      overflow: hidden;
     }
 
     .frame {
       position: absolute;
       top: 0;
       left: 0;
-      width: 360px;
-      height: 360px;
+      width: 100%;
+      height: 100%;
       z-index: 0;
-      object-fit: none;
+      object-fit: fill;
       image-rendering: pixelated; /* optional */
     }
     .thumbnail{
@@ -92,26 +104,88 @@
       top: 0px;
       right: 0px;
     }
-    @media (max-width: 900px) {
+
+    /* サムネイル位置（360px基準をパーセント換算、image-container基準） */
+    .thumbnail {
+      position: absolute;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    /* movie: top:83px, left:77px, width:206px, height:155px (360px基準) */
+    .frame01 ~ .thumbnail {
+      top: 23.06%;      /* 83/360 */
+      left: 21.39%;     /* 77/360 */
+      width: 57.22%;    /* 206/360 */
+      height: 43.06%;   /* 155/360 */
+    }
+
+    /* music: top:77px, left:14px, width:335px, height:60px */
+    .frame02 ~ .thumbnail {
+      top: 21.39%;      /* 77/360 */
+      left: 3.89%;      /* 14/360 */
+      width: 93.06%;    /* 335/360 */
+      height: 16.67%;   /* 60/360 */
+    }
+
+    /* illustration: top:54px, left:4px, width:320px, height:240px */
+    .frame03 ~ .thumbnail {
+      top: 15%;         /* 54/360 */
+      left: 1.11%;      /* 4/360 */
+      width: 88.89%;    /* 320/360 */
+      height: 66.67%;   /* 240/360 */
+    }
+
+    /* material: top:107px, left:66px, width:240px, height:240px */
+    .frame04 ~ .thumbnail {
+      top: 29.72%;      /* 107/360 */
+      left: 18.33%;     /* 66/360 */
+      width: 66.67%;    /* 240/360 */
+      height: 66.67%;   /* 240/360 */
+    }
+
+    /* link: top:0px, left:0px, width:360px, height:360px */
+    .frame05 ~ .thumbnail {
+      top: 0%;
+      left: 0%;
+      width: 100%;
+      height: 100%;
+    }
+    @media (max-width: 768px) {
         .header {
           width: 0vw;
           display: none;
         }
 
         .works {
-          margin-left: 0;         /* ← これを追加！ */
+          margin-left: 0;
           width: 100vw;
           flex-direction: column;
           align-items: center;
-	        padding: 10px 20px; 
+          padding-left:0px;
+          
+          box-sizing: border-box;
         }
 
         .card {
+          /* 画面幅の85%になるように計算（360pxが基準） */
+          width: 87vw;
           transform-origin: center top;
-          margin-right: 0;
-	        margin-left: 0;
-          margin-top: 80px;
-          margin-bottom: 160px;
+          margin-right: 0px;
+          margin-left: 0px;
+          margin-top: 0px;
+          margin-bottom: calc(85vw * -0.1);
+        }
+
+        .card .image-container {
+          width: 100%;
+          height: auto;
+          aspect-ratio: 1 / 1;
+        }
+
+        .card .frame {
+          width: 100%;
+          height: 100%;
         }
     }
 
@@ -159,6 +233,21 @@
             >
           </div>
 
+          <!-- ▼ linkカテゴリは<a>タグで囲む -->
+          <template v-else-if="work.category === 'link'">
+            <a :href="work.link" :target="work.link.startsWith('mailto:') ? '_self' : '_blank'" :rel="work.link.startsWith('mailto:') ? '' : 'noopener'" style="display: block; text-decoration: none; color: inherit; cursor: pointer;">
+              <img
+                :src="frame05"
+                class="frame frame05"
+              >
+              <img
+                :src="work.image"
+                :alt="work.title"
+                class="thumbnail"
+              >
+            </a>
+          </template>
+
           <!-- ▼ それ以外の通常作品 -->
           <template v-else>
             <img
@@ -167,28 +256,22 @@
               class="frame frame01"
               @click.stop="goTo(work)"
             >
-            <img 
-              v-if="work.category === 'music'" 
-              :src="frame02" 
+            <img
+              v-if="work.category === 'music'"
+              :src="frame02"
               class="frame frame02"
               @click.stop="goTo(work)"
             >
-            <img 
-              v-if="work.category === 'illustration'" 
-              :src="frame03" 
+            <img
+              v-if="work.category === 'illustration'"
+              :src="frame03"
               class="frame frame03"
               @click.stop="goTo(work)"
             >
-            <img 
-              v-if="work.category === 'material'" 
-              :src="frame04" 
+            <img
+              v-if="work.category === 'material'"
+              :src="frame04"
               class="frame frame04"
-              @click.stop="goTo(work)"
-            >
-            <img 
-              v-if="work.category === 'link'" 
-              :src="frame05" 
-              class="frame frame05"
               @click.stop="goTo(work)"
             >
 
@@ -196,7 +279,6 @@
               :src="work.image"
               :alt="work.title"
               class="thumbnail"
-              :style="getThumbnailStyle(work.category)"
             >
           </template>
 
@@ -234,51 +316,52 @@
             { id: 40, image: 'images/seki_remix.jpg', title: '『咳 -Remixies-』ジャケットイラスト', description: 'コンピレーションアルバム『咳 -Remixies-』イラストを担当しました。', link: 'https://youtu.be/BXrKqPDTpCg',  category: 'illustration' },
             { id: 39, image: 'images/hiki_goudou.jpg', title: '『Bless you.』イラスト寄稿', description: '合同誌『Bless you.』にイラストを寄稿しました。運営の手伝いもさせていただいております。', link: 'https://reiutsubo.booth.pm/items/7718300',  category: 'illustration' },
             { id: 38, image: 'images/chill.jpg', title: '二十歳', description: 'コンピレーションアルバム『『Chill』コンピ』に書き下ろした曲です。', link: 'https://youtu.be/XBIYO-n2pRg',  category: 'music' },
-            { id: 44, image: 'images/yoso/l_e.png', title: '連絡先', description: '', link: 'inemurivc6@gmail.com',  category: 'link' },
-            { id: 37, image: 'images/seikan.jpg', title: '星間ミトン', description: '日あさ寝様に書き下ろさせていただいた楽曲です。日あさ寝様の1st EP『光としるべ』収録楽曲です。', link: 'https://youtu.be/9AIe10o_OO0',  category: 'music' },
-            { id: 36, image: '', title: '宵音ムリ', description: '', link: 'https://drive.google.com/drive/folders/1iXzscLgJJCw49khpYpySo6lsF_vYj-PC?usp=drive_link',  category: 'yoinemuri' },
-            { id: 35, image: 'images/sanporon.jpg', title: '『散歩論』 MV', description: 'MIDy様の楽曲『散歩論』のMVを制作いたしました。uotakさんとの共同制作です。', link: 'https://youtu.be/Xwkk6xvB6Bw',  category: 'movie' },
-            { id: 34, image: 'images/scale.jpg', title: 'スケール・ディストーション', description: 'コンピレーションアルバムの主催をしました。', link: 'https://www.nicovideo.jp/watch/sm45186841',  category: 'material' },
-	          { id: 33, image: 'images/suraimura.jpg', title: 'スライ村', description: 'MVを制作しました。キラハピ2025参加曲です。', link: 'https://www.nicovideo.jp/watch/sm45059106',  category: 'movie' },  
-            { id: 45, image: 'images/yoso/l_d.png', title: '倉庫', description: '', link: 'https://drive.google.com/drive/folders/1j1o906NKeZeHR6hbPXGM8qcupxwhksrO?usp=drive_link',  category: 'link' },
-            { id: 32, image: 'images/torobleed.jpg', title: 'ヘリウム', description: 'コンピレーションアルバム『TORO BLEED』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44926322',  category: 'music' },
-            { id: 31, image: 'images/ww.jpg', title: 'さよなら領宇チュー', description: 'コンピレーションアルバム『Walk with (       )』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44864414',  category: 'music' },
-            { id: 30, image: 'images/usotudu.jpg', title: 'あきのそら', description: 'コンピレーションアルバム『ウソのつづきかた』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44913244',  category: 'music' },
-            { id: 29, image: 'images/zenbuore.jpg', title: 'スライ村', description: 'コンピレーションアルバム『全部俺2』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44892616',  category: 'music' },
-            { id: 44, image: 'images/yoso/l_x.png', title: 'X', description: '', link: 'https://x.com/JDq5e',  category: 'link' },
-            { id: 28, image: 'images/zenbuore.jpg', title: '『全部俺2』背景', description: 'ジャケットの背景部分を担当しました。ウモ夫も描きました！', link: 'https://x.com/Zenb_Ore/status/1912823384347721912',  category: 'illustration' },
-            { id: 27, image: 'images/VDDW.jpg', title: '『VOCALOID DJ WORLD(VDDW)』イラスト', description: 'フライヤー用のイラストを担当しました。', link: 'https://x.com/shadowmixt_ktwd/status/1894712098766442881',  category: 'illustration' },
-            { id: 26, image: 'images/korekaraverb.jpg', title: 'これからバーブ', description: 'MVを制作しました。ボカコレ2025冬TOP100参加曲です。', link: 'https://www.nicovideo.jp/watch/sm44691761',  category: 'movie' },
-            { id: 45, image: 'images/yoso/l_b.png', title: 'BOOTH', description: '', link: 'https://saiminnohhoh.booth.pm/',  category: 'link' },
-            { id: 25, image: 'images/likeamothtoaflame.jpg', title: '『like a moth to a flame』イラスト', description: '香柚季様の楽曲『like a moth to a flame』イラスト及びアニメーションを担当しました。', link: 'https://www.nicovideo.jp/watch/sm44607235' ,  category: 'illustration'},
-            { id: 24, image: 'images/kemurinominato.jpg', title: '『煙の湊』MV', description: '世界電力様の楽曲『煙の湊』MVを担当いたしました。', link: 'https://www.nicovideo.jp/watch/sm44568500' ,  category: 'movie'},
-            { id: 23, image: 'images/seki.jpg', title: '《咳》ジャケットイラスト', description: 'コンピレーションアルバム《咳》イラストを担当しました。', link: 'https://kazehikicompi.booth.pm/items/6552582' ,  category: 'illustration'},
-            { id: 45, image: 'images/yoso/l_bs.png', title: 'Bluesky', description: '', link: 'https://bsky.app/profile/jdq5e.bsky.social',  category: 'link' },
-            { id: 22, image: 'images/kawaiicompi.jpg', title: 'してんししてん', description: 'コンピレーションアルバム『カワイイコンピレーション～コミック版～』に書き下ろした曲です。ジャケットとXFDもイラストで少し手伝っております。', link: 'https://www.nicovideo.jp/watch/sm44339297' ,  category: 'music'},
-            { id: 21, image: 'images/genzaichi.jpg', title: '『ボーカロイド文化の現在地２』表紙イラスト', description: '表紙のイラストを担当しました。', link: 'https://x.com/highland_sh/status/1856896970000142580' ,  category: 'illustration'},
-            { id: 20, image: 'images/zattou.jpg', title: '雑踏の気持ち', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm44246685' ,  category: 'movie'},
-            { id: 19, image: 'images/bluehole.jpg', title: 'blue hOle', description: 'バチカアフ様の1stミニアルバム『blue hOle』に原作を提供しました。', link: 'https://www.youtube.com/watch?v=QY828rDU2yQ' ,  category: 'music'},
-            { id: 45, image: 'images/yoso/l_n.png', title: 'niconico', description: '', link: 'https://www.nicovideo.jp/user/72858407',  category: 'link' },
-            { id: 18, image: 'images/sonataka.jpg', title: '『それと同じ陽の暖かさ』作詞・作曲・調声・動画', description: 'ボカタッグ参加作品（遅刻）です。', link: 'https://www.nicovideo.jp/watch/sm43889685' ,  category: 'movie'},
-            { id: 45, image: 'images/yoso/l_bl.png', title: 'Bilibili', description: '', link: 'https://space.bilibili.com/3546781648423361',  category: 'link' },
-            { id: 17, image: 'images/reiteshow.jpg', title: 'これからバーブ', description: 'コンピレーションアルバム『レイトショー』に書き下ろした曲です。', link: 'https://youtu.be/kItKsZnH40Q?si=uu-_RyG48fSSiOM2' ,  category: 'music'},
-            { id: 16, image: 'images/xyoku.jpg', title: '『ょく』作詞・作曲・調声', description: 'ボカタッグ参加作品です。', link: 'https://www.nicovideo.jp/watch/sm43683720' ,  category: 'music'},
-            { id: 15, image: 'images/shadoteto.jpg', title: '『シャドテト』イラスト', description: 'フライヤー用のイラストを担当しました。', link: 'https://x.com/shadowmixt_ktwd/status/1774030255067631961' ,  category: 'illustration'},
-            { id: 14, image: 'images/naguhima4koma.jpg', title: '『凪乃ヒマワリ』四コマ漫画', description: 'スピンオフ的な四コマ漫画を描きました。', link: 'https://x.com/NagnoHimawari/status/1773660946415636741' ,  category: 'illustration'},
-            { id: 13, image: 'images/naguhima.jpg', title: '『凪乃ヒマワリ』イラスト', description: '開発中の合成音声『凪乃ヒマワリ』のイラストを描きました。', link: 'https://x.com/NagnoHimawari/status/1768590103751123312' ,  category: 'illustration'},
-            { id: 12, image: 'images/usotuki.jpg', title: '内緒のサンタさん', description: 'コンピレーションアルバム『ウソのつきかた』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm43330276' ,  category: 'music'},
-            { id: 11, image: 'images/urami.jpg', title: 'うらみ交信', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm43340135' ,  category: 'movie'},
-            { id: 10, image: 'images/vocayuku2.jpg', title: 'あるく道', description: 'コンピレーションアルバム『合成音声のゆくえ2』に書き下ろした曲です。', link: 'https://booth.pm/ja/items/5281762' ,  category: 'music'},
-            { id: 9, image: 'images/hato.jpg', title: 'エンドリン・はと', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm42588301' ,  category: 'movie'},
-            { id: 8, image: 'images/dreampillow.jpg', title: 'Dream Pillow', description: '1stアルバムをリリースしました。', link: 'https://booth.pm/ja/items/4834996' ,  category: 'material'},
-            { id: 7, image: 'images/retro.jpg', title: 'レトロフューチャー・ビーイング', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm42044823' ,  category: 'movie'},
-            { id: 6, image: 'images/tumoyuki.jpg', title: 'つもゆきパーク逍遥', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41843498' ,  category: 'movie'},
-            { id: 5, image: 'images/nikotte.jpg', title: 'NIKOTTE', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41744046' ,  category: 'movie'},
-            { id: 44, image: 'images/yoso/l_y.png', title: 'YouTube', description: '', link: 'https://www.youtube.com/@user-JDq5e',  category: 'link' },
-            { id: 4, image: 'images/deadend.jpg', title: 'デッドエンド♡チョコレート', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41311489' ,  category: 'movie'},
-            { id: 3, image: 'images/yukuehumei.jpg', title: '行方不名', description: '無色透名祭に参加しました。', link: 'https://www.nicovideo.jp/watch/so40804218' ,  category: 'music'},
-            { id: 2, image: 'images/seikimatu.jpg', title: '世紀末初恋譚', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm39846942' ,  category: 'movie'},
-            { id: 44, image: 'images/yoso/l_s.png', title: 'Soundcloud', description: '', link: 'https://soundcloud.com/user-295610565',  category: 'link' },
+            { id: 47, image: 'images/yoso/l_e.png', title: '連絡先', description: '', link: 'mailto:inemurivc6@gmail.com',  category: 'link' },
+            { id: 46, image: 'images/seikan.jpg', title: '星間ミトン', description: '日あさ寝様に書き下ろさせていただいた楽曲です。日あさ寝様の1st EP『光としるべ』収録楽曲です。', link: 'https://youtu.be/9AIe10o_OO0',  category: 'music' },
+            { id: 45, image: '', title: '宵音ムリ', description: '', link: 'https://drive.google.com/drive/folders/1iXzscLgJJCw49khpYpySo6lsF_vYj-PC?usp=drive_link',  category: 'yoinemuri' },
+            { id: 44, image: 'images/sanporon.jpg', title: '『散歩論』 MV', description: 'MIDy様の楽曲『散歩論』のMVを制作いたしました。uotakさんとの共同制作です。', link: 'https://youtu.be/Xwkk6xvB6Bw',  category: 'movie' },
+            { id: 43, image: 'images/scale.jpg', title: 'スケール・ディストーション', description: 'コンピレーションアルバムの主催をしました。', link: 'https://www.nicovideo.jp/watch/sm45186841',  category: 'material' },
+	          { id: 42, image: 'images/suraimura.jpg', title: 'スライ村', description: 'MVを制作しました。キラハピ2025参加曲です。', link: 'https://www.nicovideo.jp/watch/sm45059106',  category: 'movie' },  
+            { id: 41, image: 'images/yoso/l_d.png', title: '倉庫', description: '', link: 'https://drive.google.com/drive/folders/1j1o906NKeZeHR6hbPXGM8qcupxwhksrO?usp=drive_link',  category: 'link' },
+            { id: 40, image: 'images/torobleed.jpg', title: 'ヘリウム', description: 'コンピレーションアルバム『TORO BLEED』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44926322',  category: 'music' },
+            { id: 39, image: 'images/ww.jpg', title: 'さよなら領宇チュー', description: 'コンピレーションアルバム『Walk with (       )』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44864414',  category: 'music' },
+            { id: 38, image: 'images/usotudu.jpg', title: 'あきのそら', description: 'コンピレーションアルバム『ウソのつづきかた』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44913244',  category: 'music' },
+            { id: 37, image: 'images/zenbuore.jpg', title: 'スライ村', description: 'コンピレーションアルバム『全部俺2』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm44892616',  category: 'music' },
+            { id: 36, image: 'images/yoso/l_x.png', title: 'X', description: '', link: 'https://x.com/JDq5e',  category: 'link' },
+            { id: 35, image: 'images/zenbuore.jpg', title: '『全部俺2』背景', description: 'ジャケットの背景部分を担当しました。ウモ夫も描きました！', link: 'https://x.com/Zenb_Ore/status/1912823384347721912',  category: 'illustration' },
+            { id: 34, image: 'images/VDDW.jpg', title: '『VOCALOID DJ WORLD(VDDW)』イラスト', description: 'フライヤー用のイラストを担当しました。', link: 'https://x.com/shadowmixt_ktwd/status/1894712098766442881',  category: 'illustration' },
+            { id: 33, image: 'images/korekaraverb.jpg', title: 'これからバーブ', description: 'MVを制作しました。ボカコレ2025冬TOP100参加曲です。', link: 'https://www.nicovideo.jp/watch/sm44691761',  category: 'movie' },
+            { id: 32, image: 'images/yoso/l_b.png', title: 'BOOTH', description: '', link: 'https://saiminnohhoh.booth.pm/',  category: 'link' },
+            { id: 31, image: 'images/likeamothtoaflame.jpg', title: '『like a moth to a flame』イラスト', description: '香柚季様の楽曲『like a moth to a flame』イラスト及びアニメーションを担当しました。', link: 'https://www.nicovideo.jp/watch/sm44607235' ,  category: 'illustration'},
+            { id: 30, image: 'images/kemurinominato.jpg', title: '『煙の湊』MV', description: '世界電力様の楽曲『煙の湊』MVを担当いたしました。', link: 'https://www.nicovideo.jp/watch/sm44568500' ,  category: 'movie'},
+            { id: 29, image: 'images/seki.jpg', title: '《咳》ジャケットイラスト', description: 'コンピレーションアルバム《咳》イラストを担当しました。', link: 'https://kazehikicompi.booth.pm/items/6552582' ,  category: 'illustration'},
+            { id: 28, image: 'images/yoso/l_bs.png', title: 'Bluesky', description: '', link: 'https://bsky.app/profile/jdq5e.bsky.social',  category: 'link' },
+            { id: 27, image: 'images/d_gassaku.jpg', title: '【DTM鯖合作】メルト', description: '1番Bメロを担当しております。', link: 'https://www.nicovideo.jp/watch/sm44563896' ,  category: 'movie'},
+            { id: 26, image: 'images/kawaiicompi.jpg', title: 'してんししてん', description: 'コンピレーションアルバム『カワイイコンピレーション～コミック版～』に書き下ろした曲です。ジャケットとXFDもイラストで少し手伝っております。', link: 'https://www.nicovideo.jp/watch/sm44339297' ,  category: 'music'},
+            { id: 25, image: 'images/genzaichi.jpg', title: '『ボーカロイド文化の現在地２』表紙イラスト', description: '表紙のイラストを担当しました。', link: 'https://x.com/highland_sh/status/1856896970000142580' ,  category: 'illustration'},
+            { id: 24, image: 'images/zattou.jpg', title: '雑踏の気持ち', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm44246685' ,  category: 'movie'},
+            { id: 23, image: 'images/bluehole.jpg', title: 'blue hOle', description: 'バチカアフ様の1stミニアルバム『blue hOle』に原作を提供しました。', link: 'https://www.youtube.com/watch?v=QY828rDU2yQ' ,  category: 'music'},
+            { id: 22, image: 'images/yoso/l_n.png', title: 'niconico', description: '', link: 'https://www.nicovideo.jp/user/72858407',  category: 'link' },
+            { id: 21, image: 'images/sonataka.jpg', title: '『それと同じ陽の暖かさ』作詞・作曲・調声・動画', description: 'ボカタッグ参加作品（遅刻）です。', link: 'https://www.nicovideo.jp/watch/sm43889685' ,  category: 'movie'},
+            //{ id: 20, image: 'images/yoso/l_bl.png', title: 'Bilibili', description: '', link: 'https://space.bilibili.com/3546781648423361',  category: 'link' },
+            { id: 19, image: 'images/reiteshow.jpg', title: 'これからバーブ', description: 'コンピレーションアルバム『レイトショー』に書き下ろした曲です。', link: 'https://youtu.be/kItKsZnH40Q?si=uu-_RyG48fSSiOM2' ,  category: 'music'},
+            { id: 18, image: 'images/xyoku.jpg', title: '『ょく』作詞・作曲・調声', description: 'ボカタッグ参加作品です。', link: 'https://www.nicovideo.jp/watch/sm43683720' ,  category: 'music'},
+            { id: 17, image: 'images/shadoteto.jpg', title: '『シャドテト』イラスト', description: 'フライヤー用のイラストを担当しました。', link: 'https://x.com/shadowmixt_ktwd/status/1774030255067631961' ,  category: 'illustration'},
+            { id: 16, image: 'images/naguhima4koma.jpg', title: '『凪乃ヒマワリ』四コマ漫画', description: 'スピンオフ的な四コマ漫画を描きました。', link: 'https://x.com/NagnoHimawari/status/1773660946415636741' ,  category: 'illustration'},
+            { id: 15, image: 'images/naguhima.jpg', title: '『凪乃ヒマワリ』イラスト', description: '開発中の合成音声『凪乃ヒマワリ』のイラストを描きました。', link: 'https://x.com/NagnoHimawari/status/1768590103751123312' ,  category: 'illustration'},
+            { id: 14, image: 'images/usotuki.jpg', title: '内緒のサンタさん', description: 'コンピレーションアルバム『ウソのつきかた』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm43330276' ,  category: 'music'},
+            { id: 13, image: 'images/urami.jpg', title: 'うらみ交信', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm43340135' ,  category: 'movie'},
+            { id: 12, image: 'images/vocayuku2.jpg', title: 'あるく道', description: 'コンピレーションアルバム『合成音声のゆくえ2』に書き下ろした曲です。', link: 'https://booth.pm/ja/items/5281762' ,  category: 'music'},
+            { id: 11, image: 'images/hato.jpg', title: 'エンドリン・はと', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm42588301' ,  category: 'movie'},
+            { id: 10, image: 'images/dreampillow.jpg', title: 'Dream Pillow', description: '1stアルバムをリリースしました。', link: 'https://booth.pm/ja/items/4834996' ,  category: 'material'},
+            { id: 9, image: 'images/retro.jpg', title: 'レトロフューチャー・ビーイング', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm42044823' ,  category: 'movie'},
+            { id: 8, image: 'images/tumoyuki.jpg', title: 'つもゆきパーク逍遥', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41843498' ,  category: 'movie'},
+            { id: 7, image: 'images/nikotte.jpg', title: 'NIKKOTTE', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41744046' ,  category: 'movie'},
+            { id: 6, image: 'images/yoso/l_y.png', title: 'YouTube', description: '', link: 'https://www.youtube.com/@user-JDq5e',  category: 'link' },
+            { id: 5, image: 'images/deadend.jpg', title: 'デッドエンド♡チョコレート', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41311489' ,  category: 'movie'},
+            { id: 4, image: 'images/yukuehumei.jpg', title: '行方不名', description: '無色透名祭に参加しました。', link: 'https://www.nicovideo.jp/watch/so40804218' ,  category: 'music'},
+            { id: 3, image: 'images/seikimatu.jpg', title: '世紀末初恋譚', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm39846942' ,  category: 'movie'},
+            { id: 2, image: 'images/yoso/l_s.png', title: 'Soundcloud', description: '', link: 'https://soundcloud.com/user-295610565',  category: 'link' },
             { id: 1, image: 'images/ita.jpg', title: '居た。', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm39053012' ,  category: 'movie'}
           ]
         };
@@ -297,7 +380,7 @@
         this.works.forEach((work) => {
           work.offsetX = Math.floor(Math.random() * 30 - 15);
           work.offsetY = Math.floor(Math.random() * 30 - 15);
-          work.rotation = Math.random() * 2 - 1;
+          work.rotation = Math.random() * 4 -2;
         });
 
         // 2) linkカテゴリだけ“1回だけ”順番をシャッフル
@@ -342,77 +425,22 @@
         },
 
         getCardStyle(work) {
-		  const scale = window.innerWidth <= 900 ? 1.5 : 0.78;
-          const origin = window.innerWidth <= 900 ? 'center top' : 'top left';
-        
           return {
-            transform: `scale(${scale}) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`,
-            transformOrigin: origin
+            transform: `scale(var(--card-scale)) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`
           };
         },
 
           goTo(work) {
             if (!work.link) return;
-            window.open(work.link, '_blank', 'noopener');
-          },
-
-        getThumbnailStyle(category) {
-          switch (category) {
-            case 'movie':
-              return {
-                position: 'absolute',
-                top: '83px',
-                left: '77px',
-                width: '206px',
-                height: '155px',
-                objectFit: 'cover',
-                zIndex: 1
-              };
-            case 'music':
-              return {
-                position: 'absolute',
-                top: '77px',
-                left: '14px',
-                width: '335px',
-                height: '60px',
-                objectFit: 'cover',
-                zIndex: 1
-              };
-            case 'illustration':
-              return {
-                position: 'absolute',
-                top: '54px',
-                left: '4px',
-                width: '320px',
-                height: '240px',
-                objectFit: 'cover',
-                zIndex: 1
-              };
-            case 'material':
-              return {
-                position: 'absolute',
-                top: '107px',
-                left: '66px',
-                width: '240px',
-                height: '240px',
-                objectFit: 'cover',
-                zIndex: 1
-              };
-            case 'link':
-              return {
-                position: 'absolute',
-                top: '0px',
-                left: '0px',
-                width: '360px',
-                height: '360px',
-                objectFit: 'cover',
-                zIndex: 1
-              };
-              
-            default:
-              return {};
+            // mailtoリンクの場合は<a>タグを動的に作成してクリック
+            if (work.link.startsWith('mailto:')) {
+              const a = document.createElement('a');
+              a.href = work.link;
+              a.click();
+            } else {
+              window.open(work.link, '_blank', 'noopener');
+            }
           }
-        }
       }
     }).mount('#app');
   </script>
@@ -462,7 +490,7 @@
         p.pixelDensity(1);
         p.frameRate(30);
 
-        const isMobile = window.innerWidth <= 990;
+        const isMobile = window.innerWidth <= 768;
         PARTICLE_COUNT = isMobile ? 20 : 40;
 
         refillImgBag();
@@ -543,9 +571,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
