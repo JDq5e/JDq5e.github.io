@@ -25,6 +25,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Works | 稲むり">
 
+  <link rel="preload" href="images/yoso/loader.gif" as="image">
   <title>Works | 稲むり</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,7 +106,7 @@
     }
 
     /* フレームごとの位置微調整 */
-    .frame01, .frame02 , .frame03 , .frame04, .frameYM, .frame05{
+    .frame01, .frame02 , .frame03 , .frame04, .frameYM, .frame05, .frame06{
       top: 0px;
       right: 0px;
     }
@@ -156,6 +157,14 @@
       width: 100%;
       height: 100%;
     }
+
+    /* year: top:0px, left:0px, width:360px, height:360px */
+    .frame06 ~ .thumbnail {
+      top: 0%;
+      left: 0%;
+      width: 100%;
+      height: 100%;
+    }
     @media (max-width: 768px) {
         .header {
           width: 0vw;
@@ -194,10 +203,32 @@
         }
     }
 
+    html {
+      background-color: rgb(90, 162, 163);
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background-color: rgb(90, 162, 163);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease;
+    }
+    #loading.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #loading img {
+      image-rendering: pixelated;
+    }
+
     body {
       font-family: "Zen Maru Gothic", serif;
       font-weight: 400;
-      font-size: 17px;
+      font-size: 18px;
       font-style: normal;
       color: #ffffff;
       margin: 0;
@@ -205,6 +236,9 @@
   </style>
 </head>
 <body>
+  <div id="loading">
+    <img src="images/yoso/loader.gif" alt="loading">
+  </div>
   <div id="p5-background"></div>
   <div id="app">
     <div
@@ -237,6 +271,20 @@
               class="frame frameYM"
             >
           </div>
+
+          <!-- ▼ yearカテゴリは非インタラクティブな区切り -->
+          <template v-else-if="work.category === 'year'">
+            <img
+              :src="frame06"
+              class="frame frame06"
+              style="cursor: default;"
+            >
+            <img
+              :src="work.image"
+              :alt="work.title"
+              class="thumbnail"
+            >
+          </template>
 
           <!-- ▼ linkカテゴリは<a>タグで囲む -->
           <template v-else-if="work.category === 'link'">
@@ -290,13 +338,25 @@
         </div>
 
         <h3>{{ work.title }}</h3>
-        <p>{{ work.description }}</p>
+        <p v-if="work.category !== 'year'">{{ work.description }}</p>
       </div>
       <div style="height: 50px; width: 100%;">
         <p style="text-align: center; font-size: 14px; color: #ffffff;">copyright© 稲むり 2025 All Rights Reserved.</p>
       </div>
     </div>
   </div>
+
+  <script>
+    // ロード管理：p5とVueの両方が揃ったらローディング画面を消す
+    const loadState = { p5: false, vue: false };
+    function checkHideLoading() {
+      if (!loadState.p5 || !loadState.vue) return;
+      const el = document.getElementById('loading');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 650);
+    }
+  </script>
 
   <script>
     Vue.createApp({
@@ -309,18 +369,24 @@
           frame03: 'images/yoso/frame_illustration.png',
           frame04: 'images/yoso/frame_material.png',
           frame05: 'images/yoso/frame_link.png',
+          frame06: 'images/yoso/frame_year.png',
           frameYM: 'images/yoso/frame_yoinemuri.png',
           frameYMActive: 'images/yoso/frame_yoinemuri_1.png',
           isYoinemuriActive: false,
           //内容
           works: [
-            { id: 43, image: 'images/naisho.jpg', title: '内緒のサンタさん', description: 'MVを制作しました。', link: 'https://youtu.be/_roqbcKPJMo',  category: 'movie' },
-            { id: 42, image: 'images/lalala.jpg', title: '『ラララのラ』MV', description: '小田晃生様の楽曲『ラララのラ』のMVを制作いたしました。', link: 'https://youtu.be/9K7mOvT2uBE',  category: 'movie' },
-            { id: 44, image: 'images/yoso/l_t.png', title: 'Threads', description: '', link: 'https://www.threads.com/@jdq5e',  category: 'link' },
-	          { id: 41, image: 'images/mijika.jpg', title: '身近', description: '2ndアルバムをリリースしました。', link: 'https://youtu.be/QCPqsuq720E',  category: 'material' },  
-            { id: 40, image: 'images/seki_remix.jpg', title: '『咳 -Remixies-』ジャケットイラスト', description: 'コンピレーションアルバム『咳 -Remixies-』イラストを担当しました。', link: 'https://youtu.be/BXrKqPDTpCg',  category: 'illustration' },
-            { id: 39, image: 'images/hiki_goudou.jpg', title: '『Bless you.』イラスト寄稿', description: '合同誌『Bless you.』にイラストを寄稿しました。運営の手伝いもさせていただいております。', link: 'https://reiutsubo.booth.pm/items/7718300',  category: 'illustration' },
-            { id: 38, image: 'images/chill.jpg', title: '二十歳', description: 'コンピレーションアルバム『『Chill』コンピ』に書き下ろした曲です。', link: 'https://youtu.be/XBIYO-n2pRg',  category: 'music' },
+            { id: 58, image: 'images/0out.jpg', title: '『0-out』イラスト寄稿', description: '合同誌『0-out』にイラストを寄稿しました。', link: 'https://x.com/nekobasi_illust/status/2035302924323369400?s=20',  category: 'illustration' },
+            { id: 57, image: 'images/ルミノール反応.jpg', title: 'ルミノール反応(稲むりremix)', description: 'リミックスアルバム『Walk with ( )』にて、赤坂んんん様の楽曲『ルミノール反応』のRemixを制作しました。', link: 'https://soundcloud.com/user-295610565/remix',  category: 'music' },
+            { id: 56, image: 'images/juvenile.jpg', title: '『juvenile』イラスト寄稿', description: '環田考様のイラスト本『juvenile』にイラストを寄稿しました。', link: 'https://x.com/kanda_kou/status/2028286397753524289?s=20',  category: 'illustration' },
+            { id: 55, image: 'images/panorama.jpg', title: 'はるのくも', description: 'Sou様に書き下ろさせていただいた楽曲です。Sou様の5th album『Panorama』収録楽曲です。', link: 'https://open.spotify.com/intl-ja/track/18tCn54hkfPTjz3MoD8NPZ?si=bb7237e1adc54d71',  category: 'music' },
+            { id: 2, image: 'images/yoso/y_25.png', title: '以下2025年の作品', description: '', link: '',  category: 'year' },
+            { id: 54, image: 'images/naisho.jpg', title: '内緒のサンタさん', description: 'MVを制作しました。', link: 'https://youtu.be/_roqbcKPJMo',  category: 'movie' },
+            { id: 53, image: 'images/lalala.jpg', title: '『ラララのラ』MV', description: '小田晃生様の楽曲『ラララのラ』のMVを制作いたしました。', link: 'https://youtu.be/9K7mOvT2uBE',  category: 'movie' },
+            { id: 52, image: 'images/yoso/l_t.png', title: 'Threads', description: '', link: 'https://www.threads.com/@jdq5e',  category: 'link' },
+	          { id: 51, image: 'images/mijika.jpg', title: '身近', description: '2ndアルバムをリリースしました。', link: 'https://nodee.net/a/e87gk8zc4gh3',  category: 'material' },  
+            { id: 50, image: 'images/seki_remix.jpg', title: '『咳 -Remixies-』ジャケットイラスト', description: 'コンピレーションアルバム『咳 -Remixies-』イラストを担当しました。', link: 'https://youtu.be/BXrKqPDTpCg',  category: 'illustration' },
+            { id: 49, image: 'images/hiki_goudou.jpg', title: '『Bless you.』イラスト寄稿', description: '合同誌『Bless you.』にイラストを寄稿しました。運営の手伝いもさせていただいております。', link: 'https://reiutsubo.booth.pm/items/7718300',  category: 'illustration' },
+            { id: 48, image: 'images/chill.jpg', title: '二十歳', description: 'コンピレーションアルバム『『Chill』コンピ』に書き下ろした曲です。', link: 'https://youtu.be/XBIYO-n2pRg',  category: 'music' },
             { id: 47, image: 'images/yoso/l_e.png', title: '連絡先', description: '', link: 'mailto:inemurivc6@gmail.com',  category: 'link' },
             { id: 46, image: 'images/seikan.jpg', title: '星間ミトン', description: '日あさ寝様に書き下ろさせていただいた楽曲です。日あさ寝様の1st EP『光としるべ』収録楽曲です。', link: 'https://youtu.be/9AIe10o_OO0',  category: 'music' },
             { id: 45, image: '', title: '宵音ムリ', description: '', link: 'https://drive.google.com/drive/folders/1iXzscLgJJCw49khpYpySo6lsF_vYj-PC?usp=drive_link',  category: 'yoinemuri' },
@@ -341,6 +407,7 @@
             { id: 30, image: 'images/kemurinominato.jpg', title: '『煙の湊』MV', description: '世界電力様の楽曲『煙の湊』MVを担当いたしました。', link: 'https://www.nicovideo.jp/watch/sm44568500' ,  category: 'movie'},
             { id: 29, image: 'images/seki.jpg', title: '《咳》ジャケットイラスト', description: 'コンピレーションアルバム《咳》イラストを担当しました。', link: 'https://kazehikicompi.booth.pm/items/6552582' ,  category: 'illustration'},
             { id: 28, image: 'images/yoso/l_bs.png', title: 'Bluesky', description: '', link: 'https://bsky.app/profile/jdq5e.bsky.social',  category: 'link' },
+            { id: 2, image: 'images/yoso/y_24.png', title: '以下2024年の作品', description: '', link: '',  category: 'year' },
             { id: 27, image: 'images/d_gassaku.jpg', title: '【DTM鯖合作】メルト', description: '1番Bメロを担当しております。', link: 'https://www.nicovideo.jp/watch/sm44563896' ,  category: 'movie'},
             { id: 26, image: 'images/kawaiicompi.jpg', title: 'してんししてん', description: 'コンピレーションアルバム『カワイイコンピレーション～コミック版～』に書き下ろした曲です。ジャケットとXFDもイラストで少し手伝っております。', link: 'https://www.nicovideo.jp/watch/sm44339297' ,  category: 'music'},
             { id: 25, image: 'images/genzaichi.jpg', title: '『ボーカロイド文化の現在地２』表紙イラスト', description: '表紙のイラストを担当しました。', link: 'https://x.com/highland_sh/status/1856896970000142580' ,  category: 'illustration'},
@@ -356,6 +423,7 @@
             { id: 15, image: 'images/naguhima.jpg', title: '『凪乃ヒマワリ』イラスト', description: '開発中の合成音声『凪乃ヒマワリ』のイラストを描きました。', link: 'https://x.com/NagnoHimawari/status/1768590103751123312' ,  category: 'illustration'},
             { id: 14, image: 'images/usotuki.jpg', title: '内緒のサンタさん', description: 'コンピレーションアルバム『ウソのつきかた』に書き下ろした曲です。', link: 'https://www.nicovideo.jp/watch/sm43330276' ,  category: 'music'},
             { id: 13, image: 'images/urami.jpg', title: 'うらみ交信', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm43340135' ,  category: 'movie'},
+            { id: 2, image: 'images/yoso/y_23.png', title: '以下2023年の作品', description: '', link: '',  category: 'year' },
             { id: 12, image: 'images/vocayuku2.jpg', title: 'あるく道', description: 'コンピレーションアルバム『合成音声のゆくえ2』に書き下ろした曲です。', link: 'https://booth.pm/ja/items/5281762' ,  category: 'music'},
             { id: 11, image: 'images/hato.jpg', title: 'エンドリン・はと', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm42588301' ,  category: 'movie'},
             { id: 10, image: 'images/dreampillow.jpg', title: 'Dream Pillow', description: '1stアルバムをリリースしました。', link: 'https://booth.pm/ja/items/4834996' ,  category: 'material'},
@@ -363,10 +431,12 @@
             { id: 8, image: 'images/tumoyuki.jpg', title: 'つもゆきパーク逍遥', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41843498' ,  category: 'movie'},
             { id: 7, image: 'images/nikotte.jpg', title: 'NIKKOTTE', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41744046' ,  category: 'movie'},
             { id: 6, image: 'images/yoso/l_y.png', title: 'YouTube', description: '', link: 'https://www.youtube.com/@user-JDq5e',  category: 'link' },
+            { id: 2, image: 'images/yoso/y_22.png', title: '以下2022年の作品', description: '', link: '',  category: 'year' },
             { id: 5, image: 'images/deadend.jpg', title: 'デッドエンド♡チョコレート', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm41311489' ,  category: 'movie'},
             { id: 4, image: 'images/yukuehumei.jpg', title: '行方不名', description: '無色透名祭に参加しました。', link: 'https://www.nicovideo.jp/watch/so40804218' ,  category: 'music'},
             { id: 3, image: 'images/seikimatu.jpg', title: '世紀末初恋譚', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm39846942' ,  category: 'movie'},
             { id: 2, image: 'images/yoso/l_s.png', title: 'Soundcloud', description: '', link: 'https://soundcloud.com/user-295610565',  category: 'link' },
+            { id: 2, image: 'images/yoso/y_21.png', title: '以下2021年の作品', description: '', link: '',  category: 'year' },
             { id: 1, image: 'images/ita.jpg', title: '居た。', description: '曲とMVを制作しました。', link: 'https://www.nicovideo.jp/watch/sm39053012' ,  category: 'movie'}
           ]
         };
@@ -388,8 +458,20 @@
           work.rotation = Math.random() * 4 -2;
         });
 
-        // 2) linkカテゴリだけ“1回だけ”順番をシャッフル
+        // 2) linkカテゴリだけ”1回だけ”順番をシャッフル
         const target = 'link';
+
+        // DOM描画後にサムネイル読み込み完了を待つ
+        this.$nextTick(() => {
+          const imgs = [...document.querySelectorAll('.thumbnail')];
+          if (imgs.length === 0) { loadState.vue = true; checkHideLoading(); return; }
+          let count = 0;
+          const onDone = () => { if (++count >= imgs.length) { loadState.vue = true; checkHideLoading(); } };
+          imgs.forEach(img => {
+            if (img.complete) { onDone(); }
+            else { img.addEventListener('load', onDone); img.addEventListener('error', onDone); }
+          });
+        });
 
         const idxs = [];
         const items = [];
@@ -489,6 +571,9 @@
       }
 
       p.setup = () => {
+        // preload()完了 → p5側の準備OK
+        loadState.p5 = true; checkHideLoading();
+
         p.background(90, 162, 163)
         const cnv = p.createCanvas(window.innerWidth, window.innerHeight);
         cnv.parent('p5-background');
