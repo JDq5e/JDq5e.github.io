@@ -100,6 +100,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: flex-start;
       min-height: 100vh;
       padding-left: 15px;
       padding-right: 0px;
@@ -124,9 +125,10 @@
     }
 
     .card {
+      position: relative;
       width: 355px;
       transform-origin: top left;
-      margin-bottom: -50px;
+      margin-bottom: -15px;
       margin-right: -20px;
       margin-top: 10px;
       transition: transform 0.3s ease;
@@ -134,7 +136,16 @@
       text-align: center;
     }
 
+    .card:hover {
+      z-index: 10;
+    }
+
     .card .description {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      margin-top: 0;
       max-height: 0;
       overflow: hidden;
       transform: translateY(8px);
@@ -273,7 +284,7 @@
           margin-right: 0px;
           margin-left: 0px;
           margin-top: 0px;
-          margin-bottom: calc(85vw * -0.1);
+          margin-bottom: -60px;
         }
 
         .card .image-container {
@@ -288,6 +299,7 @@
         }
 
         .card .description {
+          position: static;
           max-height: 200px;
           transform: translateY(0);
         }
@@ -326,6 +338,7 @@
 
     h3 {
       font-size: 23px;
+      margin: 1em 0 0.7em 0;
     }
   </style>
 </head>
@@ -357,6 +370,8 @@
       :key="`${work.id}-${idx}`"
       :style="getCardStyle(work)"
       @click.stop
+      @mouseenter="onCardEnter"
+      @mouseleave="onCardLeave"
     >
         <div class="image-container">
 
@@ -456,7 +471,7 @@
       const el = document.getElementById('loading');
       if (!el) return;
       el.classList.add('fade-out');
-      setTimeout(() => el.remove(), 650);
+      setTimeout(() => el.remove(), 350);
     }
   </script>
 
@@ -614,8 +629,20 @@
 
         getCardStyle(work) {
           return {
-            transform: `scale(var(--card-scale)) translate(${work.offsetX}px, ${work.offsetY}px) rotate(${work.rotation}deg)`
+            transform: `scale(var(--card-scale)) translate(${work.offsetX}px, calc(${work.offsetY}px - var(--hover-lift, 0px))) rotate(${work.rotation}deg)`
           };
+        },
+
+        onCardEnter(e) {
+          const card = e.currentTarget;
+          const desc = card.querySelector('.description');
+          if (!desc) return;
+          const lift = Math.min(desc.scrollHeight, 200) / 2;
+          card.style.setProperty('--hover-lift', `${lift}px`);
+        },
+
+        onCardLeave(e) {
+          e.currentTarget.style.setProperty('--hover-lift', '0px');
         },
 
           goTo(work) {
