@@ -108,14 +108,42 @@
       overflow-x: hidden;
     }
 
+    @media (min-width: 1920px) {
+        .header {
+          width: 519px;
+        }
+
+        .works {
+          margin-left: 500px;
+          width: calc(100% - 500px);
+        }
+        .moji {
+          width: 384px;
+          height: auto;
+        }
+    }
+
     .card {
-      width: 360px;
+      width: 355px;
       transform-origin: top left;
       margin-bottom: -50px;
       margin-right: -20px;
       margin-top: 10px;
       transition: transform 0.3s ease;
       --card-scale: 0.78;
+      text-align: center;
+    }
+
+    .card .description {
+      max-height: 0;
+      overflow: hidden;
+      transform: translateY(8px);
+      transition: transform 0.3s, max-height 0.3s;
+    }
+
+    .card:hover .description {
+      max-height: 200px;
+      transform: translateY(0);
     }
     .image-container {
       position: relative;
@@ -141,6 +169,11 @@
     .frame01, .frame02 , .frame03 , .frame04, .frameYM, .frame05, .frame06{
       top: 0px;
       right: 0px;
+    }
+
+    /* movie/music/illustration/material はクリックでページ遷移するのでホバー時に手カーソル */
+    .frame01, .frame02, .frame03, .frame04 {
+      cursor: pointer;
     }
 
     /* サムネイル位置（360px基準をパーセント換算、image-container基準） */
@@ -197,6 +230,26 @@
       width: 100%;
       height: 100%;
     }
+    @media (max-width: 1370px) {
+        .header {
+          margin-top: 30px;
+          position: static;
+          top: auto;
+          left: auto;
+          width: 100%;
+          height: 400px;
+        }
+
+        .moji {
+          width: 380px;
+        }
+
+        .works {
+          margin-left: 0;
+          width: 100%;
+        }
+    }
+
     @media (max-width: 768px) {
         .header {
           width: 0vw;
@@ -232,6 +285,11 @@
         .card .frame {
           width: 100%;
           height: 100%;
+        }
+
+        .card .description {
+          max-height: 200px;
+          transform: translateY(0);
         }
     }
 
@@ -382,7 +440,7 @@
         </div>
 
         <h3>{{ work.title }}</h3>
-        <p v-if="work.category !== 'year'">{{ work.description }}</p>
+        <p class="description" v-if="work.category !== 'year'">{{ work.description }}</p>
       </div>
       <div style="height: 50px; width: 100%;">
         <p style="text-align: center; font-size: 14px; color: #ffffff;">copyright© 稲むり 2025 All Rights Reserved.</p>
@@ -427,7 +485,7 @@
             { id: 64, image: 'images/zenbuore3.jpg',           title: '『全部俺 PARTⅢ』背景',                          description: 'ジャケットの背景部分を担当しました。布団も描きました！',                                                                                        link: 'https://x.com/Zenb_Ore/status/2044717442019279170?s=20',  category: 'illustration' },
             { id: 63, image: 'images/0out.jpg',           title: '『0-out』イラスト寄稿',                          description: '合同誌『0-out』にイラストを寄稿しました。',                                                                                        link: 'https://x.com/nekobasi_illust/status/2035302924323369400?s=20',  category: 'illustration' },
             { id: 62, image: 'images/ルミノール反応.jpg', title: 'ルミノール反応(稲むりremix)',                      description: 'リミックスアルバム『Walk with ( )』にて、赤坂んんん様の楽曲『ルミノール反応』のRemixを制作しました。',                                   link: 'https://soundcloud.com/user-295610565/remix',                     category: 'music' },
-            { id: 61, image: 'images/juvenile.jpg',        title: '『juvenile』イラスト寄稿',                        description: '環田考様のイラスト本『juvenile』にイラストを寄稿しました。',                                                                      link: 'https://x.com/kanda_kou/status/2028286397753524289?s=20',         category: 'illustration' },
+            { id: 61, image: 'images/juvenile.jpg',        title: '『juvenile』イラスト寄稿',                        description: '環田考先生のイラスト本『juvenile』にイラストを寄稿しました。',                                                                      link: 'https://x.com/kanda_kou/status/2028286397753524289?s=20',         category: 'illustration' },
             { id: 60, image: 'images/panorama.jpg',        title: 'はるのくも',                                      description: 'Sou様に書き下ろさせていただいた楽曲です。Sou様の5th album『Panorama』収録楽曲です。',                                               link: 'https://open.spotify.com/intl-ja/track/18tCn54hkfPTjz3MoD8NPZ?si=bb7237e1adc54d71', category: 'music' },
             { id: 59, image: 'images/yoso/y_25.png',      title: '以下2025年の作品',                                description: '', link: '',                                                                                                                   category: 'year' },
             { id: 58, image: 'images/naisho.jpg',          title: '内緒のサンタさん',                                description: 'MVを制作しました。',                                                                                                           link: 'https://youtu.be/_roqbcKPJMo',                                   category: 'movie' },
@@ -503,8 +561,8 @@
       mounted() {
         // 1) 全カードにランダム見た目を付与
         this.works.forEach((work) => {
-          work.offsetX = Math.floor(Math.random() * 30 - 15);
-          work.offsetY = Math.floor(Math.random() * 30 - 15);
+          work.offsetX = Math.floor(Math.random() * 70 - 35);
+          work.offsetY = Math.floor(Math.random() * 70 - 35);
           work.rotation = Math.random() * 4 -2;
         });
 
@@ -576,6 +634,9 @@
   </script>
 
   <script>
+
+    // ここからP5による背景描画
+    
     const FLOW_SPEED = 0.15;
     const FLOW_ANGLE = Math.PI * 0.15; // 角度（0=右, PI/2=下）
 
